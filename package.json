@@ -1,0 +1,15 @@
+{
+  "name": "random-tiny-concert",
+  "version": "1.0.0",
+  "description": "Enjoy a random Tiny Desk Concert",
+  "main": "server/app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Juan Carlos Asensio",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "node-fetch": "^2.6.5"
+  }
+}
