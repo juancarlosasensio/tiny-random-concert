@@ -2,19 +2,16 @@ document.addEventListener('DOMContentLoaded', async (e) => {
     const mainEl = document.querySelector('[data-tiny-desk-concert]');
 
     if (mainEl) {
-        const res = await fetch('/random-concert');
+        let concertList = JSON.parse(localStorage.getItem('concerts'));
 
-        console.log({ res })
-        const concertList = await res.json();
+        if (!concertList) {
+          const res = await fetch('/random-concert');
+          concertList = await res.json();
 
-
-        const upperLimit = concertList.length - 1
-
-        console.log({ res }, { concertList }, { upperLimit });
+          localStorage.setItem('concerts', JSON.stringify(concertList));
+        }
 
         const randIndex = getRandomInt(concertList.length - 1)
-        
-
         const randConcertLink = concertList[randIndex]
 
         mainEl.innerHTML = `

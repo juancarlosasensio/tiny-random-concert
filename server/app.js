@@ -23,7 +23,7 @@ const readFile = (callback, returnJson = false, filePath = pathToData, encoding 
 
 };
 
-const writeFile = (fileData, callback, filePath = dataPath, encoding = 'utf8') => {
+const writeFile = (fileData, callback, filePath = pathToData, encoding = 'utf8') => {
 
     fs.writeFile(filePath, fileData, encoding, (err) => {
         if (err) {
@@ -42,16 +42,34 @@ app.get('/', (req, res) => {
 
 app.get('/random-concert', async (req, res) => {
   const URL = 'https://en.wikipedia.org/w/api.php?action=parse&format=json&page=List_of_Tiny_Desk_Concerts&formatversion=2';
-  const wikipediaRes = await fetch(URL);
-  const data = await wikipediaRes.json();
 
   // Useful for debugging...
   // console.log(data.parse.externallinks);
 
-  const now = new Date(Date.now().toString());
+  // const now = new Date(Date.now().toString());
 
-  const newData = readFile((data) => {
-    res.send(data.externalLinks);
+  readFile(async (data) => {
+    if (data?.isDataStale) {
+      console.log('data is STALE')
+
+      const wikipediaRes = await fetch(URL);
+      const fetchedData = await wikipediaRes.json();
+
+      const dataToCacheAndSend = {
+        isDataStale: false, 
+        externallinks: [...fetchedData.parse.externallinks]
+      };
+
+      writeFile(JSON.stringify(dataToCacheAndSend, null, 2), () => {
+        res.send(dataToCacheAndSend.externallinks);
+      });
+      
+    } else {
+      console.log('data is FRESH');
+      
+      console.log(data)
+      res.send(data?.externallinks);
+    }
   }, true);
 
   // const externalLinks = 
