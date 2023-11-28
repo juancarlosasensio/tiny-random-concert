@@ -11,22 +11,11 @@ const port = 3000;
  * VARIABLES
  */
 
+const pathToData = path.resolve(__dirname, '../data', 'externalLinks.json');
+
 /**
  * HELPER METHODS
  */
-
-const pathToData = path.resolve(__dirname, '../data', 'externalLinks.json');
-
-// const readFile = (callback, returnJson = false, filePath = pathToData, encoding = 'utf8') => {
-//     fs.readFile(filePath, encoding, (err, data) => {
-//         if (err) {
-//             throw err;
-//         }
-
-//         callback(returnJson ? JSON.parse(data) : data);
-//     });
-
-// };
 
 const writeFile = (fileData, callback, filePath = pathToData, encoding = 'utf8') => {
 
@@ -55,10 +44,11 @@ const getCachedData = async () => {
 };
 
 const isConcertLink = (link) => (
-  (link.includes('tiny-desk-concert') || link.includes('tiny-desk-concert')) && 
+  (link.includes('tiny-desk-concert') || link.includes('tiny-desk-home-concert')) && 
   link.startsWith('https://www.npr.org/') &&
-  !link.includes('series') &&
-  !link.includes('sections')
+  (!link.includes('series') &&
+  !link.includes('sections') && 
+  !link.includes('story.php'))
 );
 
 /** 
@@ -79,8 +69,6 @@ app.get('/', (req, res) => {
 app.get('/random-concert', async (req, res) => {
   const URL = 'https://en.wikipedia.org/w/api.php?action=parse&format=json&page=List_of_Tiny_Desk_Concerts&formatversion=2';
 
-  // Useful for debugging...
-  // console.log(data.parse.externallinks);
 
   // How will we be using dates to check if data is too old or is stale?
   // const now = new Date(Date.now().toString());
@@ -99,6 +87,10 @@ app.get('/random-concert', async (req, res) => {
 
     const wikipediaRes = await fetch(URL);
     const fetchedData = await wikipediaRes.json();
+
+  // Useful for debugging...
+  console.log(Object.keys(fetchedData.parse));
+  console.log(Object.keys(fetchedData.parse.categories));
 
     const filteredLinks = fetchedData.parse.externallinks.filter(isConcertLink);
 
