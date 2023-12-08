@@ -1,8 +1,16 @@
-const fs = require('fs');
-const util = require('util');
-const express = require('express');
-const path = require('path');
-const fetch = require('node-fetch');
+// const fs = require('fs');
+// const util = require('util');
+
+import fs from 'fs';
+import util from 'util';
+import express from 'express';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import fetch from 'node-fetch';
+
+// const express = require('express');
+// const path = require('path');
+// const fetch = require('node-fetch');
 
 const app = express();
 const port = 3000;
@@ -10,6 +18,9 @@ const port = 3000;
 /**
  * VARIABLES
  */
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const pathToData = path.resolve(__dirname, '../data', 'externalLinks.json');
 
