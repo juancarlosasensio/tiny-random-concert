@@ -114,7 +114,7 @@ app.get('/:name', async (req, resp) => {
     if (!fs.existsSync(path.resolve(__dirname, '../public', `${routePath}.html`))) {
         console.log("no dir ", routePath);
         
-        resp.statusCode = 204;
+        resp.statusCode = 404;
         resp.end("Route not found")
     } else {
       resp.sendFile(path.resolve(__dirname, '../public', `${routePath}.html`));
