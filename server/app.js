@@ -69,20 +69,6 @@ app.get('/', (req, resp) => {
     resp.sendFile(path.resolve(__dirname, '../public', 'index.html'));
 });
 
-app.get('/:name', async (req, resp) => {
-    let routePath = req.params.name;
-
-    if (!fs.existsSync(path.resolve(__dirname, '../public', `${routePath}.html`))) {
-        console.log("no dir ", routePath);
-        
-        resp.statusCode = 404;
-        resp.end("Route not found")
-    } else {
-      resp.sendFile(path.resolve(__dirname, '../public', `${routePath}.html`));
-    }
-
-})
-
 app.get('/api/random-concert', async (req, res) => {
   const URL = 'https://en.wikipedia.org/w/api.php?action=parse&format=json&page=List_of_Tiny_Desk_Concerts&formatversion=2';
 
@@ -120,6 +106,20 @@ app.get('/api/random-concert', async (req, res) => {
       res.send(dataToCacheAndSend.externallinks);
     });
   }
+})
+
+app.get('/:name', async (req, resp) => {
+    let routePath = req.params.name;
+
+    if (!fs.existsSync(path.resolve(__dirname, '../public', `${routePath}.html`))) {
+        console.log("no dir ", routePath);
+        
+        resp.statusCode = 404;
+        resp.end("Route not found")
+    } else {
+      resp.sendFile(path.resolve(__dirname, '../public', `${routePath}.html`));
+    }
+
 })
 
 app.listen(port, () => {
