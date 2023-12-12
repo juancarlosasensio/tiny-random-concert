@@ -1,6 +1,3 @@
-// const fs = require('fs');
-// const util = require('util');
-
 import fs from 'fs';
 import util from 'util';
 import express from 'express';
@@ -8,19 +5,14 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import fetch from 'node-fetch';
 
-// const express = require('express');
-// const path = require('path');
-// const fetch = require('node-fetch');
-
 const app = express();
 const port = 3000;
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 /**
  * VARIABLES
  */
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 const pathToData = path.resolve(__dirname, '../data', 'externalLinks.json');
 
@@ -73,9 +65,23 @@ app.use(express.static(path.resolve(__dirname, '../public')));
  * ROUTES
  */
 
-app.get('/', (req, res) => {
-    res.sendFile(path.resolve(__dirname, '../public', 'index.html'));
+app.get('/', (req, resp) => {
+    resp.sendFile(path.resolve(__dirname, '../public', 'index.html'));
 });
+
+app.get('/:name', async (req, resp) => {
+    let routePath = req.params.name;
+
+    if (!fs.existsSync(path.resolve(__dirname, '../public', `${routePath}.html`))) {
+        console.log("no dir ", routePath);
+        
+        resp.statusCode = 404;
+        resp.end("Route not found")
+    } else {
+      resp.sendFile(path.resolve(__dirname, '../public', `${routePath}.html`));
+    }
+
+})
 
 app.get('/random-concert', async (req, res) => {
   const URL = 'https://en.wikipedia.org/w/api.php?action=parse&format=json&page=List_of_Tiny_Desk_Concerts&formatversion=2';
@@ -99,9 +105,9 @@ app.get('/random-concert', async (req, res) => {
     const wikipediaRes = await fetch(URL);
     const fetchedData = await wikipediaRes.json();
 
-  // Useful for debugging...
-  console.log(Object.keys(fetchedData.parse));
-  console.log(Object.keys(fetchedData.parse.categories));
+    // // Useful for debugging...
+    // console.log(Object.keys(fetchedData.parse));
+    // console.log(Object.keys(fetchedData.parse.categories));
 
     const filteredLinks = fetchedData.parse.externallinks.filter(isConcertLink);
 
@@ -115,27 +121,6 @@ app.get('/random-concert', async (req, res) => {
     });
   }
 })
-
-/**
- *  
- * 
- *  Fetch-and-set step: 
- *  Fetch wikipedia data...
- *  store it in a file
- *  Time stamp that file
- *  
- *  Request-handle step:
- *  When request comes in, check if data is stale (this can be optional for now)
- *  If data is not stale: get data from file in memory...
- *  Else: do Fetch-and-set
- * 
- *  Response step:
- * 
- *  Return non-stale data in response
- *  
- * 
- *    
- */
 
 app.listen(port, () => {
   console.log(`Example app listening on port http://localhost:${port}/`)
