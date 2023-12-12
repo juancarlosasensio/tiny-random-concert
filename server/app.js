@@ -83,7 +83,7 @@ app.get('/:name', async (req, resp) => {
 
 })
 
-app.get('/random-concert', async (req, res) => {
+app.get('/api/random-concert', async (req, res) => {
   const URL = 'https://en.wikipedia.org/w/api.php?action=parse&format=json&page=List_of_Tiny_Desk_Concerts&formatversion=2';
 
 
