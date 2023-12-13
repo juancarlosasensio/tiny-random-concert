@@ -1,26 +1,21 @@
 import fs from 'node:fs/promises';
-import util from 'util';
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fetch from 'node-fetch';
 
+/**
+ * VARIABLES
+ */
 const app = express();
 const port = 3000;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-/**
- * VARIABLES
- */
-
 const pathToData = path.resolve(__dirname, '../data', 'externalLinks.json');
 
 /**
  * HELPER METHODS
  */
-
-
 const fileExistsForPath = async (path) => !!(await fs.stat(path).catch(e => false));
 
 const writeFile = (fileData, callback, filePath = pathToData, encoding = 'utf8') => {
@@ -58,14 +53,11 @@ const isConcertLink = (link) => (
 /** 
  * MIDDLEWARE
  */
-
 app.use(express.static(path.resolve(__dirname, '../public')));
-
 
 /**
  * ROUTES
  */
-
 app.get('/', (req, resp) => {
     resp.sendFile(path.resolve(__dirname, '../public', 'index.html'));
 });
@@ -94,8 +86,6 @@ app.get('/:name', async (req, resp) => {
       resp.sendFile(path.resolve(__dirname, '../ssr', `${routePath}.html`));
     }
 })
-
-
 
 app.get('/api/random-concert', async (req, res) => {
   const URL = 'https://en.wikipedia.org/w/api.php?action=parse&format=json&page=List_of_Tiny_Desk_Concerts&formatversion=2';
