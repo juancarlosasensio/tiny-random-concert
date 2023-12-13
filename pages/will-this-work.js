@@ -9,7 +9,6 @@ function helloWorld() {
       </body>
     </html>
   `
-  console.log(html);
   return html;
 }
 
