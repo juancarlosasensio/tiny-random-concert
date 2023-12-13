@@ -1,4 +1,4 @@
-import fs from 'fs';
+import fs from 'node:fs/promises';
 import util from 'util';
 import express from 'express';
 import path from 'path';
@@ -20,6 +20,9 @@ const pathToData = path.resolve(__dirname, '../data', 'externalLinks.json');
  * HELPER METHODS
  */
 
+
+const fileExistsForPath = async (path) => !!(await fs.stat(path).catch(e => false));
+
 const writeFile = (fileData, callback, filePath = pathToData, encoding = 'utf8') => {
 
     fs.writeFile(filePath, fileData, encoding, (err) => {
@@ -30,8 +33,6 @@ const writeFile = (fileData, callback, filePath = pathToData, encoding = 'utf8')
         callback();
     });
 };
-
-const readFile = util.promisify(fs.readFile);
 
 const getCachedData = async () => {
   try {
@@ -68,6 +69,33 @@ app.use(express.static(path.resolve(__dirname, '../public')));
 app.get('/', (req, resp) => {
     resp.sendFile(path.resolve(__dirname, '../public', 'index.html'));
 });
+
+app.get('/:name', async (req, resp, next) => {
+    let routePath = req.params.name;
+    const fileExists = await fileExistsForPath(path.resolve(__dirname, '../public', `${routePath}.html`));
+
+    if (!fileExists) {
+        next();
+    } else {
+      resp.sendFile(path.resolve(__dirname, '../public', `${routePath}.html`));
+    }
+})
+
+app.get('/:name', async (req, resp) => {
+    let routePath = req.params.name;
+    const fileExists = await fileExistsForPath(path.resolve(__dirname, '../ssr', `${routePath}.html`));
+
+    if (!fileExists) {
+        console.log("no dir ", routePath);
+        
+        resp.statusCode = 404;
+        resp.end("Route not found")
+    } else {
+      resp.sendFile(path.resolve(__dirname, '../ssr', `${routePath}.html`));
+    }
+})
+
+
 
 app.get('/api/random-concert', async (req, res) => {
   const URL = 'https://en.wikipedia.org/w/api.php?action=parse&format=json&page=List_of_Tiny_Desk_Concerts&formatversion=2';
@@ -106,20 +134,6 @@ app.get('/api/random-concert', async (req, res) => {
       res.send(dataToCacheAndSend.externallinks);
     });
   }
-})
-
-app.get('/:name', async (req, resp) => {
-    let routePath = req.params.name;
-
-    if (!fs.existsSync(path.resolve(__dirname, '../public', `${routePath}.html`))) {
-        console.log("no dir ", routePath);
-        
-        resp.statusCode = 404;
-        resp.end("Route not found")
-    } else {
-      resp.sendFile(path.resolve(__dirname, '../public', `${routePath}.html`));
-    }
-
 })
 
 app.listen(port, () => {

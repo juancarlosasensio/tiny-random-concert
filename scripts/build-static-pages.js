@@ -1,4 +1,4 @@
-import fs from 'fs';
+import fs from 'node:fs/promises';
 import pkg from 'fs-extra';
 const { writeFile, readdir } = pkg;
 
@@ -16,7 +16,25 @@ readdir('./pages', async (err, files) => {
       if (route.includes('index.js')) {
         return;
       } else {
-        var s = fs.readFileSync(`pages/${route}`, 'utf8');
+        var s = await fs.readFile(`pages/${route}`, 'utf8');
+        var html = eval(s);
+        console.log(html)
+        await saveRender(route, html)
+      }
+   }
+})
+
+readdir('./ssr', async (err, files) => {
+    if(err) {
+        console.error(err)
+        process.exit(1)
+    }
+    for(let route of files) {
+      console.log(route)
+      if (route.includes('index.js')) {
+        return;
+      } else {
+        var s = await fs.readFile(`ssr/${route}`, 'utf8');
         var html = eval(s);
         console.log(html)
         await saveRender(route, html)
