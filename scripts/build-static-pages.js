@@ -2,10 +2,6 @@ import fs from 'node:fs/promises';
 import pkg from 'fs-extra';
 const { writeFile, readdir } = pkg;
 
-// import config from './config.json' assert {type: 'json'}
-// import { dynamicHTML } from './htmlUtils.js';
-// import { ssr } from "./ssr.js";
-
 readdir('./pages', async (err, files) => {
     if(err) {
         console.error(err)

@@ -31,14 +31,11 @@ const writeFile = (fileData, callback, filePath = pathToData, encoding = 'utf8')
 
 const getCachedData = async () => {
   try {
-    const data = await readFile(pathToData);
+    const data = await fs.readFile(pathToData);
     return JSON.parse(data);
     
   } catch (error) {
-    res.status(500).send(`
-      The following error occurred when reading the file at ${pathToData}: 
-      ${error.message}
-    `);
+    throw new Error(error.message);
   }
 };
 
@@ -95,7 +92,15 @@ app.get('/api/random-concert', async (req, res) => {
   // const now = new Date(Date.now().toString());
 
   // Can we use async/await to clean up code and catch errors appropriately?
-  const cachedData = await getCachedData();
+  let cachedData;
+  try {
+    cachedData = await getCachedData();
+  } catch (error) {
+    res.status(500).send(`
+      The following error occurred when reading the file at ${pathToData}: 
+      ${error.message}
+    `);
+  }
 
   if (!cachedData?.isDataStale) {
     console.log('data is FRESH');
