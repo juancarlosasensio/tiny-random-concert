@@ -1,15 +1,12 @@
-import fs from 'node:fs/promises';
 import express from 'express';
 import path from 'path';
-import fetch from 'node-fetch';
 import { 
   fileExistsForPath, 
   getDB, 
-  saveDB, 
   DB_PATH, 
   __dirname,
    __filename,
-  isConcertLink } from './utils.js'
+  getRandomInt } from './utils.js'
 
 /**
  * VARS and CONSTS
@@ -21,12 +18,28 @@ const port = 3000;
  * MIDDLEWARE
  */
 app.use(express.static(path.resolve(__dirname, '../public')));
+app.set('view engine', 'ejs');
 
 /**
  * ROUTES
  */
-app.get('/', (req, resp) => {
-    resp.sendFile(path.resolve(__dirname, '../public', 'index.html'));
+app.get('/', async (req, resp) => { 
+    let data;
+    try {
+      data = await getDB();  
+      const randConcertLink = data.externallinks[getRandomInt(data.externallinks.length - 1)];
+
+      resp.render('index.ejs', {
+        concertLink: randConcertLink
+      });
+        
+
+    } catch (error) {
+      resp.status(500).send(`
+        The following error occurred when reading the file at ${DB_PATH}: 
+        ${error.message}
+    `);
+    }
 });
 
 app.get('/:name', async (req, resp, next) => {
@@ -54,48 +67,22 @@ app.get('/:name', async (req, resp) => {
     }
 })
 
-app.get('/api/random-concert', async (req, res) => {
+app.get('/api/random-concert', async (req, resp) => {
   const URL = 'https://en.wikipedia.org/w/api.php?action=parse&format=json&page=List_of_Tiny_Desk_Concerts&formatversion=2';
 
   // How will we be using dates to check if data is too old or is stale?
   // const now = new Date(Date.now().toString());
 
   // Can we use async/await to clean up code and catch errors appropriately?
-  let cachedData;
+  let data;
   try {
-    cachedData = await getDB();
+    data = await getDB();
+    resp.send(data.externallinks);
   } catch (error) {
-    res.status(500).send(`
+    resp.status(500).send(`
       The following error occurred when reading the file at ${DB_PATH}: 
       ${error.message}
     `);
-  }
-
-  if (!cachedData?.isDataStale) {
-    console.log('data is FRESH');
-    const filteredLinks = cachedData?.externallinks.filter(isConcertLink);
-
-    res.send(filteredLinks);
-  
-  } else {
-    console.log('data is STALE')
-
-    const wikipediaRes = await fetch(URL);
-    const fetchedData = await wikipediaRes.json();
-    const filteredLinks = fetchedData.parse.externallinks.filter(isConcertLink);
-
-    // // Useful for debugging...
-    // console.log(Object.keys(fetchedData.parse));
-    // console.log(Object.keys(fetchedData.parse.categories));
-
-    const dataToCacheAndSend = {
-      isDataStale: false, 
-      externallinks: [...filteredLinks]
-    };
-
-    const db = await saveDB(dataToCacheAndSend);
-    res.send(db.externallinks);
-  
   }
 })
 

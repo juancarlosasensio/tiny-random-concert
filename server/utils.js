@@ -1,5 +1,6 @@
 import fs from 'node:fs/promises';
 import path from 'path';
+import fetch from 'node-fetch';
 import { fileURLToPath } from 'url';
 
 //FILESYSTEM
@@ -16,6 +17,10 @@ export const isConcertLink = (link) => (
   !link.includes('story.php'))
 );
 
+export const getRandomInt = (max) => {
+    return Math.floor(Math.random() * max);
+}
+
 export const fileExistsForPath = async (path) => !!(await fs.stat(path).catch(e => false));
 
 //DATABASE
@@ -24,13 +29,45 @@ export const DB_PATH = path.resolve(__dirname, '../data', 'externalLinks.json');
 
 export const getDB = async () => {
   try {
+    const data = await (getCachedDB());
+
+    if (!data?.isDataStale) {
+    console.log('data is FRESH');
+    return data;
+  
+    } else {
+      console.log('data is STALE')
+
+      const wikipediaRes = await fetch(URL);
+      const fetchedData = await wikipediaRes.json();
+      const filteredLinks = fetchedData.parse.externallinks.filter(isConcertLink);
+
+      // // Useful for debugging...
+      // console.log(Object.keys(fetchedData.parse));
+      // console.log(Object.keys(fetchedData.parse.categories));
+
+      const dataToCacheAndSend = {
+        isDataStale: false, 
+        externallinks: [...filteredLinks]
+      };
+      const db = await saveDB(dataToCacheAndSend);
+
+      return (db)
+    }
+  } catch (error) {
+    throw new Error(error.message);
+  }
+}
+
+export const getCachedDB = async () => {
+  try {
     const data = await fs.readFile(DB_PATH, 'utf-8');
     return JSON.parse(data);
     
   } catch (error) {
     throw new Error(error.message);
   }
-};
+}
 
 export const saveDB = async (db) => {
   await fs.writeFile(DB_PATH, JSON.stringify(db, null, 2));
