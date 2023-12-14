@@ -74,10 +74,16 @@ export const saveDB = async (db) => {
   return db;
 }
 
-const insertConcertUrl = async (data) => {
+export const getAllConcertLinks = async () => {
+  const data = await getDB();
+
+  return data?.externallinks;
+}
+
+export const insertConcertUrl = async (data) => {
   const db = await getDB();
   db.externallinks.push(data);
   await saveDB(db);
-  
+
   return data 
 }

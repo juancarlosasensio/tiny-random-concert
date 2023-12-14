@@ -6,7 +6,8 @@ import {
   DB_PATH, 
   __dirname,
    __filename,
-  getRandomInt } from './utils.js'
+  getRandomInt, 
+  getAllConcertLinks} from './utils.js'
 
 /**
  * VARS and CONSTS
@@ -25,10 +26,10 @@ app.set('view engine', 'ejs');
  * ROUTES
  */
 app.get('/', async (req, resp) => { 
-    let data;
+    let concertLinks;
     try {
-      data = await getDB();  
-      const randConcertLink = data.externallinks[getRandomInt(data.externallinks.length - 1)];
+      concertLinks = await getAllConcertLinks();  
+      const randConcertLink = concertLinks[getRandomInt(concertLinks.length - 1)];
 
       resp.render('index.ejs', {
         concertLink: randConcertLink
