@@ -73,3 +73,11 @@ export const saveDB = async (db) => {
   await fs.writeFile(DB_PATH, JSON.stringify(db, null, 2));
   return db;
 }
+
+const insertConcertUrl = async (data) => {
+  const db = await getDB();
+  db.externallinks.push(data);
+  await saveDB(db);
+  
+  return data 
+}
