@@ -1,14 +1,10 @@
 document.addEventListener('DOMContentLoaded', async (e) => {
-    const mainEl = document.querySelector('[data-tiny-desk-concert]');
+  let concertList = JSON.parse(localStorage.getItem('concerts'));
 
-    if (mainEl) {
-        let concertList = JSON.parse(localStorage.getItem('concerts'));
+  if (!concertList) {
+    const res = await fetch(`/api/random-concert`);
+    concertList = await res.json();
 
-        if (!concertList) {
-          const res = await fetch(`/api/random-concert`);
-          concertList = await res.json();
-
-          localStorage.setItem('concerts', JSON.stringify(concertList));
-        }
-    }
+    localStorage.setItem('concerts', JSON.stringify(concertList));
+  }
 })
