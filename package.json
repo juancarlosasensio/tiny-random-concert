@@ -3,15 +3,18 @@
   "version": "1.0.0",
   "description": "Enjoy a random Tiny Desk Concert",
   "main": "server/app.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon server/app.js"
+    "dev": "node scripts/build-static-pages.js && nodemon server/app.js"
   },
   "author": "Juan Carlos Asensio",
   "license": "MIT",
   "dependencies": {
     "body-parser": "^1.20.2",
+    "ejs": "^3.1.9",
     "express": "^4.18.2",
+    "fs-extra": "^11.2.0",
     "node-fetch": "^2.6.5"
   },
   "devDependencies": {
