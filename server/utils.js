@@ -4,9 +4,12 @@ import fetch from 'node-fetch';
 import { fileURLToPath } from 'url';
 
 //FILESYSTEM
-
 export const __filename = fileURLToPath(import.meta.url);
 export const __dirname = path.dirname(__filename);
+
+//CONSTANTS
+  export const URL = 'https://en.wikipedia.org/w/api.php?action=parse&format=json&page=List_of_Tiny_Desk_Concerts&formatversion=2';
+  export const DB_PATH = path.resolve(__dirname, '../data', 'externalLinks.json');
 
 // UTILS
 export const isConcertLink = (link) => (
@@ -24,9 +27,6 @@ export const getRandomInt = (max) => {
 export const fileExistsForPath = async (path) => !!(await fs.stat(path).catch(e => false));
 
 //DATABASE
-
-export const DB_PATH = path.resolve(__dirname, '../data', 'externalLinks.json');
-
 export const getDB = async () => {
   try {
     const data = await (getCachedDB());
@@ -78,6 +78,13 @@ export const getAllConcertLinks = async () => {
   const data = await getDB();
 
   return data?.externallinks;
+}
+
+export const getRandomConcert = async () => {
+  const concertLinks = await getAllConcertLinks();
+  const randConcertLink = concertLinks[getRandomInt(concertLinks.length - 1)];
+  
+  return  randConcertLink;
 }
 
 export const insertConcertUrl = async (data) => {

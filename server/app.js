@@ -7,7 +7,8 @@ import {
   __dirname,
    __filename,
   getRandomInt, 
-  getAllConcertLinks} from './utils.js'
+  getAllConcertLinks,
+  getRandomConcert} from './utils.js'
 
 /**
  * VARS and CONSTS
@@ -69,9 +70,7 @@ app.get('/:name', async (req, resp) => {
     }
 })
 
-app.get('/api/random-concert', async (req, resp) => {
-  const URL = 'https://en.wikipedia.org/w/api.php?action=parse&format=json&page=List_of_Tiny_Desk_Concerts&formatversion=2';
-
+app.get('/api/concerts', async (req, resp) => {
   // How will we be using dates to check if data is too old or is stale?
   // const now = new Date(Date.now().toString());
 
@@ -80,6 +79,21 @@ app.get('/api/random-concert', async (req, resp) => {
   try {
     data = await getDB();
     resp.send(data.externallinks);
+  } catch (error) {
+    resp.status(500).send(`
+      The following error occurred when reading the file at ${DB_PATH}: 
+      ${error.message}
+    `);
+  }
+})
+
+app.get('/api/random-concert', async (req, resp) => {
+  // How will we be using dates to check if data is too old or is stale?
+  // const now = new Date(Date.now().toString());
+
+  // Can we use async/await to clean up code and catch errors appropriately?
+  try {
+    resp.send(await getRandomConcert());
   } catch (error) {
     resp.status(500).send(`
       The following error occurred when reading the file at ${DB_PATH}: 
