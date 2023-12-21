@@ -9,6 +9,9 @@ import {
   getRandomInt, 
   getAllConcertLinks,
   getRandomConcert} from './utils.js'
+ import fs from 'node:fs/promises';
+ import pkg from 'fs-extra';
+const { writeFile } = pkg;
 
 /**
  * VARS and CONSTS
@@ -100,6 +103,57 @@ app.get('/api/random-concert', async (req, resp) => {
       ${error.message}
     `);
   }
+})
+
+app.get('/api/increase-counter', async (req, resp) => {
+  try {
+    const file = await fs.readFile(path.resolve(__dirname, '../data', `counter.json`), { encoding: 'utf8' });
+    const data = JSON.parse(file);
+
+    const newCounter = Number(data.counter) + 1;
+    console.log(newCounter)
+    
+    let newData = {
+      counter: newCounter
+    }
+    console.log("Trying to save ", path.resolve(__dirname, '../data', 'counter.json'), newData);
+    try {
+        writeFile(path.resolve(__dirname, '../data', 'counter.json'), JSON.stringify(newData))
+
+    resp.send(newData)
+  } catch (err) {
+    resp.statusCode = 404;
+    resp.end(err)
+  }
+} catch(error) {
+  resp.statusCode = 404;
+  resp.end("Error while reading file", error.message)
+}})
+
+app.get('/api/get-counter', async (req, resp) => {
+  console.log('hello')
+  try {
+    const data = await fs.readFile(path.resolve(__dirname, '../data', `counter.json`), { encoding: 'utf8' });
+    console.log(data);
+    resp.send(data)
+  } catch (err) {
+    resp.statusCode = 404;
+    resp.end(err)
+  }
+})
+
+app.get('/:name', async (req, resp) => {
+    let routePath = req.params.name;
+    const fileExists = await fileExistsForPath(path.resolve(__dirname, '../ssr', `${routePath}.html`));
+
+    if (!fileExists) {
+        console.log("no dir ", routePath);
+        
+        resp.statusCode = 404;
+        resp.end("Route not found")
+    } else {
+      resp.sendFile(path.resolve(__dirname, '../ssr', `${routePath}.html`));
+    }
 })
 
 app.listen(port, () => {
