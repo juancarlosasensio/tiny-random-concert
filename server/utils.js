@@ -28,11 +28,13 @@ export const fileExistsForPath = async (path) => !!(await fs.stat(path).catch(e 
 
 //DATABASE
 export const getDB = async () => {
+  console.log('from getDB fn')
   try {
     const data = await (getCachedDB());
 
     if (!data?.isDataStale) {
     console.log('data is FRESH');
+
     return data;
   
     } else {
@@ -55,13 +57,18 @@ export const getDB = async () => {
       return (db)
     }
   } catch (error) {
+    console.log('Error is will be thrown from getDB() function call')
     throw new Error(error.message);
   }
 }
 
 export const getCachedDB = async () => {
+  console.log('from getCachedDB...')
   try {
     const data = await fs.readFile(DB_PATH, 'utf-8');
+
+    // console.log('from getCachedDB...', JSON.parse(data));
+
     return JSON.parse(data);
     
   } catch (error) {

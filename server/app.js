@@ -8,13 +8,59 @@ import {
    __filename,
   getRandomInt, 
   getAllConcertLinks,
-  getRandomConcert} from './utils.js'
+  getRandomConcert} from './utils.js';
+import { getDatabase, ref, set, child, get } from "firebase/database";
+
+function writeConcertlinks(links) {
+  const db = getDatabase();
+  set(ref(db, 'concerts/'), {
+    links: links
+  });
+}
+
+async function firebaseGetAllConcertLinks () {
+  const dbRef = ref(getDatabase());
+  const snapshot = await get(child(dbRef, `concerts/links/`))
+    if (snapshot.exists()) {
+      return snapshot.val();
+    } else {
+      console.log("No data available");
+      return {};
+    }
+  }
+
+
+
 
 /**
- * VARS and CONSTS
+ * VARS, CONSTS and DB init
  */
 const app = express();
 const port = 3000;
+
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyBJGaBVD8TLahpU4mWn8QgPD5erKpWSQxs",
+  authDomain: "tiny-random-concert.firebaseapp.com",
+  databaseURL: "https://tiny-random-concert-default-rtdb.firebaseio.com",
+  projectId: "tiny-random-concert",
+  storageBucket: "tiny-random-concert.appspot.com",
+  messagingSenderId: "970694270511",
+  appId: "1:970694270511:web:328bb525652cc667ac30da"
+};
+
+// Initialize Firebase
+const firebaseApp = initializeApp(firebaseConfig);
+const db = getDatabase(firebaseApp);
+
+console.log(db);
+
+
 
 /** 
  * MIDDLEWARE
@@ -22,6 +68,13 @@ const port = 3000;
 app.use(express.static(path.resolve(__dirname, '../public')));
 app.set("views", path.resolve(__dirname, '../views'));
 app.set('view engine', 'ejs');
+
+// function writeConcertLinks(links) {
+//   const db = getDatabase();
+//   set(ref(db, 'concerts/'), {
+//     links: links 
+//   });
+// }
 
 /**
  * ROUTES
@@ -77,8 +130,16 @@ app.get('/api/concerts', async (req, resp) => {
   // Can we use async/await to clean up code and catch errors appropriately?
   let data;
   try {
-    data = await getDB();
-    resp.send(data.externallinks);
+    data = await firebaseGetAllConcertLinks();
+
+    console.log(data)
+    
+    // TODO: add this to a POST request...
+    // writeConcertlinks(data?.externallinks);
+
+
+    resp.send(data);
+
   } catch (error) {
     resp.status(500).send(`
       The following error occurred when reading the file at ${DB_PATH}: 
