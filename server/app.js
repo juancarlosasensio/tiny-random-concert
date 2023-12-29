@@ -6,9 +6,8 @@ import {
   DB_PATH, 
   __dirname,
    __filename,
-  getRandomInt, 
-  getAllConcertLinks,
-  getRandomConcert} from './utils.js';
+generateHtmlPage,
+fetchRandomConcert} from './utils.js';
 import { getDatabase, ref, set, child, get } from "firebase/database";
 
 function writeConcertlinks(links) {
@@ -28,9 +27,6 @@ async function firebaseGetAllConcertLinks () {
       return {};
     }
   }
-
-
-
 
 /**
  * VARS, CONSTS and DB init
@@ -58,10 +54,6 @@ const firebaseConfig = {
 const firebaseApp = initializeApp(firebaseConfig);
 const db = getDatabase(firebaseApp);
 
-console.log(db);
-
-
-
 /** 
  * MIDDLEWARE
  */
@@ -80,22 +72,35 @@ app.set('view engine', 'ejs');
  * ROUTES
  */
 app.get('/', async (req, resp) => { 
-    let concertLinks;
-    try {
-      concertLinks = await getAllConcertLinks();  
-      const randConcertLink = concertLinks[getRandomInt(concertLinks.length - 1)];
+  try {
+    const randomConcert = await fetchRandomConcert();
 
-      resp.render('index.ejs', {
-        concertLink: randConcertLink
-      });
+    // Set Cache-Control headers for the HTML file
+    resp.setHeader('Cache-Control', 's-maxage=604800, stale-while-revalidate'); // 604800 seconds = 1 week
+
+    // Serve the HTML page with the concert information
+    resp.send(generateHtmlPage(randomConcert));
+  } catch (error) {
+    console.error('Error retrieving and serving concert data:', error);
+    resp.status(500).send('Internal Server Error');
+  }
+
+    // let concertLinks;
+    // try {
+    //   concertLinks = await getAllConcertLinks();  
+    //   const randConcertLink = concertLinks[getRandomInt(concertLinks.length - 1)];
+
+    //   resp.render('index.ejs', {
+    //     concertLink: randConcertLink
+    //   });
         
 
-    } catch (error) {
-      resp.status(500).send(`
-        The following error occurred when reading the file at ${DB_PATH}: 
-        ${error.message}
-    `);
-    }
+    // } catch (error) {
+    //   resp.status(500).send(`
+    //     The following error occurred when reading the file at ${DB_PATH}: 
+    //     ${error.message}
+    // `);
+    // }
 });
 
 app.get('/:name', async (req, resp, next) => {
@@ -134,7 +139,7 @@ app.get('/api/concerts', async (req, resp) => {
 
     console.log(data)
     
-    // TODO: add this to a POST request...
+    // TODO: add this to a POST/PUT request...
     // writeConcertlinks(data?.externallinks);
 
 
@@ -148,20 +153,20 @@ app.get('/api/concerts', async (req, resp) => {
   }
 })
 
-app.get('/api/random-concert', async (req, resp) => {
-  // How will we be using dates to check if data is too old or is stale?
-  // const now = new Date(Date.now().toString());
+// app.get('/api/random-concert', async (req, resp) => {
+//   // How will we be using dates to check if data is too old or is stale?
+//   // const now = new Date(Date.now().toString());
 
-  // Can we use async/await to clean up code and catch errors appropriately?
-  try {
-    resp.send(await getRandomConcert());
-  } catch (error) {
-    resp.status(500).send(`
-      The following error occurred when reading the file at ${DB_PATH}: 
-      ${error.message}
-    `);
-  }
-})
+//   // Can we use async/await to clean up code and catch errors appropriately?
+//   try {
+//     resp.send(await getRandomConcert());
+//   } catch (error) {
+//     resp.status(500).send(`
+//       The following error occurred when reading the file at ${DB_PATH}: 
+//       ${error.message}
+//     `);
+//   }
+// })
 
 app.listen(port, () => {
   console.log(`Example app listening on port http://localhost:${port}/`)

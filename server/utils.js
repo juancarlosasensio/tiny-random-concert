@@ -2,6 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'path';
 import fetch from 'node-fetch';
 import { fileURLToPath } from 'url';
+import { getDatabase, ref, set, child, get } from "firebase/database";
 
 //FILESYSTEM
 export const __filename = fileURLToPath(import.meta.url);
@@ -87,12 +88,12 @@ export const getAllConcertLinks = async () => {
   return data?.externallinks;
 }
 
-export const getRandomConcert = async () => {
-  const concertLinks = await getAllConcertLinks();
-  const randConcertLink = concertLinks[getRandomInt(concertLinks.length - 1)];
+// export const getRandomConcert = async () => {
+//   const concertLinks = await getAllConcertLinks();
+//   const randConcertLink = concertLinks[getRandomInt(concertLinks.length - 1)];
   
-  return  randConcertLink;
-}
+//   return  randConcertLink;
+// }
 
 export const insertConcertUrl = async (data) => {
   const db = await getDB();
@@ -100,4 +101,51 @@ export const insertConcertUrl = async (data) => {
   await saveDB(db);
 
   return data 
+}
+
+async function firebaseGetAllConcertLinks () {
+  const dbRef = ref(getDatabase());
+  const snapshot = await get(child(dbRef, `concerts/links/`))
+    if (snapshot.exists()) {
+      return snapshot.val();
+    } else {
+      console.log("No data available");
+      return {};
+    }
+  }
+
+export async function fetchRandomConcert() {
+  try {
+    // Fetch concert data from Firebase Realtime Database
+    const concertData = await firebaseGetAllConcertLinks();
+
+    // Return a random concert
+    return getRandomConcert(concertData);
+  } catch (error) {
+    console.error('Error fetching concert data:', error);
+    throw error;
+  }
+}
+
+// Function to get a random concert from the provided data
+function getRandomConcert(concertData) {
+  const randomIndex = Math.floor(Math.random() * concertData.length);
+  return concertData[randomIndex];
+}
+
+export function generateHtmlPage(link) {
+  return `
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Random Concert of the Week</title>
+      </head>
+      <body>
+        <h1>Random Concert of the Week</h1>
+        <p><strong>Link:</strong> <a href="${link}" target="_blank">${link}</a></p>
+      </body>
+    </html>
+  `
 }
