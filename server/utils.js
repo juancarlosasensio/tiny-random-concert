@@ -3,6 +3,8 @@ import path from 'path';
 import fetch from 'node-fetch';
 import { fileURLToPath } from 'url';
 import { getDatabase, ref, set, child, get } from "firebase/database";
+import axios from 'axios';
+import * as cheerio from 'cheerio';
 
 //FILESYSTEM
 export const __filename = fileURLToPath(import.meta.url);
@@ -29,34 +31,25 @@ export const fileExistsForPath = async (path) => !!(await fs.stat(path).catch(e 
 
 //DATABASE
 export const getDB = async () => {
-  console.log('from getDB fn')
   try {
-    const data = await (getCachedDB());
 
-    if (!data?.isDataStale) {
-    console.log('data is FRESH');
+    const wikipediaRes = await fetch(URL);
+    const fetchedData = await wikipediaRes.json();
+    console.log(fetchedData)
 
-    return data;
-  
-    } else {
-      console.log('data is STALE')
+    // const filteredLinks = fetchedData.parse.externallinks.filter(isConcertLink);
 
-      const wikipediaRes = await fetch(URL);
-      const fetchedData = await wikipediaRes.json();
-      const filteredLinks = fetchedData.parse.externallinks.filter(isConcertLink);
+    // // // Useful for debugging...
+    // // console.log(Object.keys(fetchedData.parse));
+    // // console.log(Object.keys(fetchedData.parse.categories));
 
-      // // Useful for debugging...
-      // console.log(Object.keys(fetchedData.parse));
-      // console.log(Object.keys(fetchedData.parse.categories));
+    // const dataToCacheAndSend = {
+    //   isDataStale: false, 
+    //   externallinks: [...filteredLinks]
+    // };
+    // const db = await saveDB(dataToCacheAndSend);
 
-      const dataToCacheAndSend = {
-        isDataStale: false, 
-        externallinks: [...filteredLinks]
-      };
-      const db = await saveDB(dataToCacheAndSend);
-
-      return (db)
-    }
+    return (fetchedData)    
   } catch (error) {
     console.log('Error is will be thrown from getDB() function call')
     throw new Error(error.message);
@@ -148,4 +141,70 @@ export function generateHtmlPage(link) {
       </body>
     </html>
   `
+}
+
+export function writeConcertlinks(links) {
+  const db = getDatabase();
+  set(ref(db, 'concerts/'), {
+    links: links
+  });
+}
+
+export async function fetchAndParseConcertsPage() {
+  try {
+    // Make a request to Wikipedia for the "Tiny Desk Concerts" page
+    const response = await axios.get('https://en.wikipedia.org/wiki/List_of_Tiny_Desk_Concerts');
+    const $ = cheerio.load(response.data);
+    
+    // console.log($.html())
+
+    const concertData = {years: [], concerts: []};
+
+    const yearHeadlines = $('h3 > span.mw-headline');
+    const tableRows = $('table.wikitable tbody tr');
+
+    // console.log(tableRows)
+        console.log(yearHeadlines.length)
+
+    yearHeadlines.each((index, element) => {
+      concertData.years.push($(element).text().trim())
+    })
+
+    // Select the relevant table and iterate over its rows
+    tableRows.each((index, element) => {
+      const columns = $(element).find('td');
+
+      if (columns.length > 1) {
+        // Working with dates...
+        // https://stackoverflow.com/questions/19597361/parse-date-month-and-year-from-javascript-date-form
+
+        const date = new Date( $(columns[0]).text().trim() );
+        let year, month, day;
+        if ( !!date.valueOf() ) { // Valid date
+            year = date.getFullYear();
+            month = date.toLocaleString('default', { month: 'long' });
+            day = date.getDate();
+        } else { 
+          /* Invalid date */ 
+        }
+
+        const artist = $(columns[1]).text().trim();
+        const link = $(columns[2]).find('a').attr('href'); // Assuming the link is in an anchor tag
+
+        concertData.concerts.push({ artist, link, year, date: `${month}, ${day}` });
+      }
+    });
+
+    // const totalConcerts = concertData.length;
+
+    // Store the concert data in Firebase Realtime Database
+    // const database = firebase.database();
+    // await database.ref('/concerts').set({ concerts: concertData, count: totalConcerts });
+
+    console.log('Concert data successfully saved to Firebase...');
+
+    return concertData
+  } catch (error) {
+    console.error('Error caching concert data:', error);
+  }
 }

@@ -7,15 +7,9 @@ import {
   __dirname,
    __filename,
 generateHtmlPage,
-fetchRandomConcert} from './utils.js';
+fetchRandomConcert,
+fetchAndParseConcertsPage} from './utils.js';
 import { getDatabase, ref, set, child, get } from "firebase/database";
-
-function writeConcertlinks(links) {
-  const db = getDatabase();
-  set(ref(db, 'concerts/'), {
-    links: links
-  });
-}
 
 async function firebaseGetAllConcertLinks () {
   const dbRef = ref(getDatabase());
@@ -61,13 +55,6 @@ app.use(express.static(path.resolve(__dirname, '../public')));
 app.set("views", path.resolve(__dirname, '../views'));
 app.set('view engine', 'ejs');
 
-// function writeConcertLinks(links) {
-//   const db = getDatabase();
-//   set(ref(db, 'concerts/'), {
-//     links: links 
-//   });
-// }
-
 /**
  * ROUTES
  */
@@ -78,29 +65,27 @@ app.get('/', async (req, resp) => {
     // Set Cache-Control headers for the HTML file
     resp.setHeader('Cache-Control', 's-maxage=604800, stale-while-revalidate'); // 604800 seconds = 1 week
 
-    // Serve the HTML page with the concert information
-    resp.send(generateHtmlPage(randomConcert));
+    resp.render('index', {
+      concertLink: randomConcert
+    });
   } catch (error) {
     console.error('Error retrieving and serving concert data:', error);
     resp.status(500).send('Internal Server Error');
   }
+});
 
-    // let concertLinks;
-    // try {
-    //   concertLinks = await getAllConcertLinks();  
-    //   const randConcertLink = concertLinks[getRandomInt(concertLinks.length - 1)];
+app.get('/api/test', async (req, resp) => { 
+  try {
+    // const data = await getDB();
 
-    //   resp.render('index.ejs', {
-    //     concertLink: randConcertLink
-    //   });
-        
+    const data = await fetchAndParseConcertsPage();
 
-    // } catch (error) {
-    //   resp.status(500).send(`
-    //     The following error occurred when reading the file at ${DB_PATH}: 
-    //     ${error.message}
-    // `);
-    // }
+    // Set Cache-Control headers for the HTML file
+    resp.send(data);
+  } catch (error) {
+    console.error('Error retrieving and serving concert data:', error);
+    resp.status(500).send('Internal Server Error');
+  }
 });
 
 app.get('/:name', async (req, resp, next) => {
