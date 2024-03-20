@@ -45,31 +45,6 @@ app.get('/', async (req, resp) => {
     }
 });
 
-app.get('/:name', async (req, resp, next) => {
-    let routePath = req.params.name;
-    const fileExists = await fileExistsForPath(path.resolve(__dirname, '../public', `${routePath}.html`));
-
-    if (!fileExists) {
-        next();
-    } else {
-      resp.sendFile(path.resolve(__dirname, '../public', `${routePath}.html`));
-    }
-})
-
-app.get('/:name', async (req, resp) => {
-    let routePath = req.params.name;
-    const fileExists = await fileExistsForPath(path.resolve(__dirname, '../ssr', `${routePath}.html`));
-
-    if (!fileExists) {
-        console.log("no dir ", routePath);
-        
-        resp.statusCode = 404;
-        resp.end("Route not found")
-    } else {
-      resp.sendFile(path.resolve(__dirname, '../ssr', `${routePath}.html`));
-    }
-})
-
 app.get('/api/concerts', async (req, resp) => {
   // How will we be using dates to check if data is too old or is stale?
   // const now = new Date(Date.now().toString());

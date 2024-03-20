@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "node scripts/build-static-pages.js && nodemon server/app.js"
+    "dev": "nodemon server/app.js"
   },
   "author": "Juan Carlos Asensio",
   "license": "MIT",
