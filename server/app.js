@@ -13,7 +13,6 @@ import { getAllConcertLinks, getRandomConcert } from './db.js';
  */
 const app = express();
 const port = 3000;
-const ENV = process.env.NODE_ENV || 'development';
 
 /** 
  * MIDDLEWARE
@@ -38,8 +37,7 @@ app.get('/', async (req, res) => {
       }
     } catch (error) {
       res.status(500).send(`
-        The following error occurred when reading the file at ${DB_PATH}: 
-        ${error.message}
+        The following error occurred: ${error.message}
     `);
     }
 });

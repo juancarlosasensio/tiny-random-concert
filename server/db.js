@@ -16,6 +16,8 @@ admin.initializeApp({
 // As an admin, the app has access to read and write all data, regardless of Security Rules
 const db = admin.database();
 
+
+// Exported CRUD methods that interact with Firebase DB
 export const getAllConcertLinks = async () => {
   let concertLinks = [];
   
@@ -34,5 +36,6 @@ export const getRandomConcert = async () => {
   return  randConcertLink;
 }
 
+// Export Firebase DB
 export default db;
 
