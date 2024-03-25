@@ -5,9 +5,8 @@ import {
   DB_PATH, 
   __dirname,
    __filename,
-  getRandomInt, 
-  getRandomConcert} from './utils.js';
-  import db from './db.js';
+  getRandomInt } from './utils.js';
+import { getAllConcertLinks, getRandomConcert } from './db.js';
 
 /**
  * Config and Constants
@@ -26,24 +25,19 @@ app.set('view engine', 'ejs');
 /**
  * ROUTES
  */
-app.get('/', async (req, resp) => { 
+app.get('/', async (req, res) => { 
     try {
-      let concertLinks = [];
-      
-      const ref = db.ref("concerts/links/");
-      await ref.once("value", function(snapshot) {
-        concertLinks = snapshot.val();
-      }); 
+      let concertLinks = await getAllConcertLinks();
 
       if (concertLinks.length) {
         const randConcertLink = concertLinks[getRandomInt(concertLinks.length - 1)];
 
-        resp.render('index.ejs', {
+        res.render('index.ejs', {
           concertLink: randConcertLink
         });
       }
     } catch (error) {
-      resp.status(500).send(`
+      res.status(500).send(`
         The following error occurred when reading the file at ${DB_PATH}: 
         ${error.message}
     `);
