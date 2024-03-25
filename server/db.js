@@ -2,7 +2,7 @@ import dotenv from 'dotenv';
 import admin from 'firebase-admin';
 import { getRandomInt } from './utils.js';
 
-dotenv.config()
+dotenv.config();
 
 // Setting up Firebase Admin SDK https://firebase.google.com/docs/database/admin/start
 const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
@@ -24,6 +24,8 @@ export const getAllConcertLinks = async () => {
   const ref = db.ref("concerts/links/");
   await ref.once("value", function(snapshot) {
     concertLinks = snapshot.val();
+
+    console.log(concertLinks)
   });
 
   return concertLinks;
