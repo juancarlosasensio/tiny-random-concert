@@ -11,7 +11,7 @@ const FIREBASE_DB_URL = toString(process.env.FIREBASE_DB_URL);
 // Initialize the app with a service account, granting admin privileges
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  databaseURL: toString(FIREBASE_DB_URL)
+  databaseURL: FIREBASE_DB_URL
 });
 
 // As an admin, the app has access to read and write all data, regardless of Security Rules
