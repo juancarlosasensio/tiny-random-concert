@@ -74,19 +74,6 @@ export const saveDB = async (db) => {
   return db;
 }
 
-export const getAllConcertLinks = async () => {
-  const data = await getDB();
-
-  return data?.externallinks;
-}
-
-export const getRandomConcert = async () => {
-  const concertLinks = await getAllConcertLinks();
-  const randConcertLink = concertLinks[getRandomInt(concertLinks.length - 1)];
-  
-  return  randConcertLink;
-}
-
 export const insertConcertUrl = async (data) => {
   const db = await getDB();
   db.externallinks.push(data);

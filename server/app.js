@@ -1,18 +1,18 @@
+import dotenv from 'dotenv';
 import express from 'express';
 import path from 'path';
 import { 
-  fileExistsForPath, 
   getDB, 
   DB_PATH, 
   __dirname,
    __filename,
-  getRandomInt, 
-  getAllConcertLinks,
-  getRandomConcert} from './utils.js'
+  getRandomInt } from './utils.js';
+import { getAllConcertLinks, getRandomConcert } from './db.js';
 
 /**
- * VARS and CONSTS
+ * Config and Constants
  */
+dotenv.config();
 const app = express();
 const port = 3000;
 
@@ -26,21 +26,20 @@ app.set('view engine', 'ejs');
 /**
  * ROUTES
  */
-app.get('/', async (req, resp) => { 
-    let concertLinks;
+app.get('/', async (req, res) => { 
     try {
-      concertLinks = await getAllConcertLinks();  
-      const randConcertLink = concertLinks[getRandomInt(concertLinks.length - 1)];
+      let concertLinks = await getAllConcertLinks();
 
-      resp.render('index.ejs', {
-        concertLink: randConcertLink
-      });
-        
+      if (concertLinks.length) {
+        const randConcertLink = concertLinks[getRandomInt(concertLinks.length - 1)];
 
+        res.render('index.ejs', {
+          concertLink: randConcertLink
+        });
+      }
     } catch (error) {
-      resp.status(500).send(`
-        The following error occurred when reading the file at ${DB_PATH}: 
-        ${error.message}
+      res.status(500).send(`
+        The following error occurred: ${error.message}
     `);
     }
 });
