@@ -1,21 +1,17 @@
-import dotenv from 'dotenv'
 import express from 'express';
 import path from 'path';
 import { 
-  fileExistsForPath, 
   getDB, 
   DB_PATH, 
   __dirname,
    __filename,
   getRandomInt, 
-  getAllConcertLinks,
   getRandomConcert} from './utils.js';
-import admin from 'firebase-admin';
+  import db from './db.js';
 
 /**
- * VARS and CONSTS
+ * Config and Constants
  */
-dotenv.config()
 const app = express();
 const port = 3000;
 const ENV = process.env.NODE_ENV || 'development';
@@ -27,26 +23,6 @@ app.use(express.static(path.resolve(__dirname, '../public')));
 app.set("views", path.resolve(__dirname, '../views'));
 app.set('view engine', 'ejs');
 
-/** 
- * Firebase – DB
- */
-
-const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
-
-// TODO: read this. Very helpful!!!
-// https://firebase.google.com/docs/database/admin/start
-
-// Initialize the app with a service account, granting admin privileges
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  // The database URL depends on the location of the database
-  databaseURL: "https://tiny-random-concert-default-rtdb.firebaseio.com/"
-});
-
-// As an admin, the app has access to read and write all data, regardless of Security Rules
-var db = admin.database();
-
-
 /**
  * ROUTES
  */
@@ -57,7 +33,6 @@ app.get('/', async (req, resp) => {
       const ref = db.ref("concerts/links/");
       await ref.once("value", function(snapshot) {
         concertLinks = snapshot.val();
-        console.log(concertLinks.length )
       }); 
 
       if (concertLinks.length) {
