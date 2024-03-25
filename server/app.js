@@ -1,3 +1,4 @@
+import dotenv from 'dotenv'
 import express from 'express';
 import path from 'path';
 import { 
@@ -8,13 +9,16 @@ import {
    __filename,
   getRandomInt, 
   getAllConcertLinks,
-  getRandomConcert} from './utils.js'
+  getRandomConcert} from './utils.js';
+import admin from 'firebase-admin';
 
 /**
  * VARS and CONSTS
  */
+dotenv.config()
 const app = express();
 const port = 3000;
+const ENV = process.env.NODE_ENV || 'development';
 
 /** 
  * MIDDLEWARE
@@ -23,20 +27,46 @@ app.use(express.static(path.resolve(__dirname, '../public')));
 app.set("views", path.resolve(__dirname, '../views'));
 app.set('view engine', 'ejs');
 
+/** 
+ * Firebase – DB
+ */
+
+const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
+
+// TODO: read this. Very helpful!!!
+// https://firebase.google.com/docs/database/admin/start
+
+// Initialize the app with a service account, granting admin privileges
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  // The database URL depends on the location of the database
+  databaseURL: "https://tiny-random-concert-default-rtdb.firebaseio.com/"
+});
+
+// As an admin, the app has access to read and write all data, regardless of Security Rules
+var db = admin.database();
+
+
 /**
  * ROUTES
  */
 app.get('/', async (req, resp) => { 
-    let concertLinks;
     try {
-      concertLinks = await getAllConcertLinks();  
-      const randConcertLink = concertLinks[getRandomInt(concertLinks.length - 1)];
+      let concertLinks = [];
+      
+      const ref = db.ref("concerts/links/");
+      await ref.once("value", function(snapshot) {
+        concertLinks = snapshot.val();
+        console.log(concertLinks.length )
+      }); 
 
-      resp.render('index.ejs', {
-        concertLink: randConcertLink
-      });
-        
+      if (concertLinks.length) {
+        const randConcertLink = concertLinks[getRandomInt(concertLinks.length - 1)];
 
+        resp.render('index.ejs', {
+          concertLink: randConcertLink
+        });
+      }
     } catch (error) {
       resp.status(500).send(`
         The following error occurred when reading the file at ${DB_PATH}: 
