@@ -74,6 +74,14 @@ app.get('/api/update-concert-data', async (req, res) => {
       const newWikipediaData = await getWikipediaData();
       const dbData = await getAllData();
 
+      console.log(newWikipediaData.externallinks[newWikipediaData.externallinks.length - 1]);
+
+      // updateConcertsLinks(newWikipediaData.externallinks[newWikipediaData.externallinks.length - 1])
+
+      console.log('logging newWikipediaData.externallinks', newWikipediaData.externallinks)
+
+      setConcertsLinks(newWikipediaData.externallinks);
+
       if (newWikipediaData.revid === dbData.revid) {
         res.json(dbData);
       } else {

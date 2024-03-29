@@ -54,14 +54,25 @@ export const setRevid = async (id) => {
   }
 };
 
-export const setConcertsLinks = async (arr) => {  
-  if (!Array.isArray(arr) || arr.length) {
+export const setConcertsLinks = async (concertsLinks) => {  
+  if (!Array.isArray(concertsLinks) || !concertsLinks.length) {
     throw new Error('concerts/links must be non-empty array');
   } else {
-    const revidRef = db.ref('concerts/links');
-    revidRef.set(arr)   
+    const linksRef = db.ref('concerts/links');
+    concertsLinks.forEach(link => linksRef.push(link))   
   }
 };
+
+export const addNewConcertLink = async (link) => {  
+  if (!link || typeof link !== 'string') {
+    throw new Error('concerts/links must be valid string');
+  } else {
+    const linksRef = db.ref('concerts/links');
+    linksRef.push(link)   
+  }
+};
+
+
 
 export const getAllConcertLinks = async () => {
   let concertLinks = [];
