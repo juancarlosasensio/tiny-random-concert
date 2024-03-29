@@ -27,6 +27,7 @@ export const getRandomInt = (max) => {
 export const fileExistsForPath = async (path) => !!(await fs.stat(path).catch(e => false));
 
 //DATABASE
+// This fn is particularly helpful for local dev
 export const getDB = async () => {
   try {
     const data = await (getCachedDB());
@@ -54,6 +55,27 @@ export const getDB = async () => {
 
       return (db)
     }
+  } catch (error) {
+    throw new Error(error.message);
+  }
+}
+
+// Simplifying the previous function to only get links from Wikipedia and return them
+export const getWikipediaData = async () => {
+  try {
+      const wikipediaRes = await fetch(URL);
+      const fetchedData = await wikipediaRes.json();
+      const filteredLinks = fetchedData.parse.externallinks.filter(isConcertLink);
+
+      console.log(fetchedData.parse)
+
+      return {
+        revid: fetchedData.parse.revid,
+        count: filteredLinks.length,
+        externallinks: filteredLinks
+
+      };
+    
   } catch (error) {
     throw new Error(error.message);
   }

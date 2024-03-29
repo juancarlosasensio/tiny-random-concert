@@ -6,8 +6,14 @@ import {
   DB_PATH, 
   __dirname,
    __filename,
-  getRandomInt } from './utils.js';
-import { getAllConcertLinks, getRandomConcert } from './db.js';
+  getRandomInt,
+  getWikipediaData } from './utils.js';
+import { 
+  getAllConcertLinks, getRandomConcert, 
+  getCurrentRevId,
+  getAllData,
+  setConcertsLinks,
+  setRevid } from './db.js';
 
 /**
  * Config and Constants
@@ -32,6 +38,8 @@ app.get('/', async (req, res) => {
 
       if (concertLinks.length) {
         const randConcertLink = concertLinks[getRandomInt(concertLinks.length - 1)];
+
+        console.log('number of concerts', concertLinks.length)
 
         res.render('index.ejs', {
           concertLink: randConcertLink
@@ -60,6 +68,25 @@ app.get('/api/concerts', async (req, resp) => {
     `);
   }
 })
+
+app.get('/api/update-concert-data', async (req, res) => { 
+    try {
+      const newWikipediaData = await getWikipediaData();
+      const dbData = await getAllData();
+
+      if (newWikipediaData.revid === dbData.revid) {
+        res.json(dbData);
+      } else {
+        setRevid(newWikipediaData.revid);
+        res.json(dbData);
+      }
+
+    } catch (error) {
+      res.status(500).send(`
+        The following error occurred: ${error.message}
+    `);
+    }
+});
 
 app.get('/api/random-concert', async (req, resp) => {
   // How will we be using dates to check if data is too old or is stale?
