@@ -6,8 +6,14 @@ import {
   DB_PATH, 
   __dirname,
    __filename,
-  getRandomInt } from './utils.js';
-import { getAllConcertLinks, getRandomConcert } from './db.js';
+  getRandomInt,
+  getWikipediaData } from './utils.js';
+import { 
+  getAllConcertLinks, 
+  getRandConcert, 
+  getAllData,
+  setConcertsLinks,
+  setRevid } from './db.js';
 
 /**
  * Config and Constants
@@ -24,19 +30,15 @@ app.set("views", path.resolve(__dirname, '../views'));
 app.set('view engine', 'ejs');
 
 /**
- * ROUTES
+ * Routes
  */
 app.get('/', async (req, res) => { 
     try {
-      let concertLinks = await getAllConcertLinks();
-
-      if (concertLinks.length) {
-        const randConcertLink = concertLinks[getRandomInt(concertLinks.length - 1)];
-
-        res.render('index.ejs', {
-          concertLink: randConcertLink
-        });
-      }
+      const randLink = await getRandConcert();
+      
+      res.render('index.ejs', {
+        concertLink: randLink
+      });
     } catch (error) {
       res.status(500).send(`
         The following error occurred: ${error.message}
@@ -45,10 +47,6 @@ app.get('/', async (req, res) => {
 });
 
 app.get('/api/concerts', async (req, resp) => {
-  // How will we be using dates to check if data is too old or is stale?
-  // const now = new Date(Date.now().toString());
-
-  // Can we use async/await to clean up code and catch errors appropriately?
   let data;
   try {
     data = await getDB();
@@ -61,15 +59,40 @@ app.get('/api/concerts', async (req, resp) => {
   }
 })
 
-app.get('/api/random-concert', async (req, resp) => {
-  // How will we be using dates to check if data is too old or is stale?
-  // const now = new Date(Date.now().toString());
+app.get('/api/update-concert-data', async (req, res) => { 
+    try {
+      const newWikipediaData = await getWikipediaData();
+      const dbData = await getAllData();
 
-  // Can we use async/await to clean up code and catch errors appropriately?
+      console.log(newWikipediaData.externallinks[newWikipediaData.externallinks.length - 1]);
+
+      // updateConcertsLinks(newWikipediaData.externallinks[newWikipediaData.externallinks.length - 1])
+
+      console.log('logging newWikipediaData.externallinks', newWikipediaData.externallinks)
+
+      setConcertsLinks(newWikipediaData.externallinks);
+
+      if (newWikipediaData.revid === dbData.revid) {
+        res.json(dbData);
+      } else {
+        setRevid(newWikipediaData.revid);
+        res.json(dbData);
+      }
+
+    } catch (error) {
+      res.status(500).send(`
+        The following error occurred: ${error.message}
+    `);
+    }
+});
+
+app.get('/api/random-concert', async (req, res) => {
   try {
-    resp.send(await getRandomConcert());
+    const randLink = await getRandConcert();
+    res.json(randLink)
+
   } catch (error) {
-    resp.status(500).send(`
+    res.status(500).send(`
       The following error occurred when reading the file at ${DB_PATH}: 
       ${error.message}
     `);
