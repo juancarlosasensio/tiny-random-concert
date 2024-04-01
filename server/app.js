@@ -6,10 +6,8 @@ import {
   DB_PATH, 
   __dirname,
    __filename,
-  getRandomInt,
   getWikipediaData } from './utils.js';
-import { 
-  getAllConcertLinks, 
+import {  
   getRandConcert, 
   getAllData,
   setConcertsLinks,
