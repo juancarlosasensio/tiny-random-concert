@@ -9,8 +9,8 @@ import {
   getRandomInt,
   getWikipediaData } from './utils.js';
 import { 
-  getAllConcertLinks, getRandomConcert, 
-  getCurrentRevId,
+  getAllConcertLinks, 
+  getRandConcert, 
   getAllData,
   setConcertsLinks,
   setRevid } from './db.js';
@@ -30,21 +30,15 @@ app.set("views", path.resolve(__dirname, '../views'));
 app.set('view engine', 'ejs');
 
 /**
- * ROUTES
+ * Routes
  */
 app.get('/', async (req, res) => { 
     try {
-      let concertLinks = await getAllConcertLinks();
-
-      if (concertLinks.length) {
-        const randConcertLink = concertLinks[getRandomInt(concertLinks.length - 1)];
-
-        console.log('number of concerts', concertLinks.length)
-
-        res.render('index.ejs', {
-          concertLink: randConcertLink
-        });
-      }
+      const randLink = await getRandConcert();
+      
+      res.render('index.ejs', {
+        concertLink: randLink
+      });
     } catch (error) {
       res.status(500).send(`
         The following error occurred: ${error.message}
@@ -53,10 +47,6 @@ app.get('/', async (req, res) => {
 });
 
 app.get('/api/concerts', async (req, resp) => {
-  // How will we be using dates to check if data is too old or is stale?
-  // const now = new Date(Date.now().toString());
-
-  // Can we use async/await to clean up code and catch errors appropriately?
   let data;
   try {
     data = await getDB();
@@ -96,15 +86,13 @@ app.get('/api/update-concert-data', async (req, res) => {
     }
 });
 
-app.get('/api/random-concert', async (req, resp) => {
-  // How will we be using dates to check if data is too old or is stale?
-  // const now = new Date(Date.now().toString());
-
-  // Can we use async/await to clean up code and catch errors appropriately?
+app.get('/api/random-concert', async (req, res) => {
   try {
-    resp.send(await getRandomConcert());
+    const randLink = await getRandConcert();
+    res.json(randLink)
+
   } catch (error) {
-    resp.status(500).send(`
+    res.status(500).send(`
       The following error occurred when reading the file at ${DB_PATH}: 
       ${error.message}
     `);
