@@ -47,6 +47,8 @@ export const getRevid = async () => {
 };
 
 export const setRevid = async (id) => {  
+  // Consider setting this kind of validation in the Firebase Realtime DB Security rules
+  // Can even request security rules as JSON: https://firebase.google.com/docs/reference/admin/node/firebase-admin.security-rules
   if (!id || typeof id !== 'number') {
     throw new Error('revid must be a valid number');
   } else {

@@ -2,8 +2,6 @@ import dotenv from 'dotenv';
 import express from 'express';
 import path from 'path';
 import { 
-  getDB, 
-  DB_PATH, 
   __dirname,
    __filename,
   getWikipediaData } from './utils.js';
@@ -44,14 +42,17 @@ app.get('/', async (req, res) => {
     }
 });
 
-app.get('/api/concerts', async (req, resp) => {
-  let data;
+app.get('/api/concerts', async (req, res) => {
+  let data = {};
   try {
-    data = await getDB();
-    resp.send(data.externallinks);
+    data = {...await getAllData()}
+    
+    res.header("Content-Type",'application/json');
+    res.send(JSON.stringify(data, null, 4));
+    
   } catch (error) {
-    resp.status(500).send(`
-      The following error occurred when reading the file at ${DB_PATH}: 
+    res.status(500).send(`
+      The following error occurred: 
       ${error.message}
     `);
   }
@@ -91,7 +92,7 @@ app.get('/api/random-concert', async (req, res) => {
 
   } catch (error) {
     res.status(500).send(`
-      The following error occurred when reading the file at ${DB_PATH}: 
+      The following error occurred: 
       ${error.message}
     `);
   }
