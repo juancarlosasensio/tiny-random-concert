@@ -35,27 +35,13 @@ export const getAllData = async () => {
   return allData;
 };
 
-export const getCurrentRevId = async () => {
+export const getRevid = async () => {
   let revid = '';  
   const ref = db.ref("concerts/revid/");
   
   await ref.once("value", function(snapshot) {
     revid = snapshot.val();
   });
-
-  return revid;
-};
-
-export const getRevid = async () => {
-  console.log('getting revid via fetch api call')
-  const revid = await fetch(`${FIREBASE_DB_URL}/concerts/revid?shallow=true?auth=${{uid: process.env.FIREBASE_AUTH_UID}}`);
-  console.log('successful fetch', { revid });
-
-  // const ref = db.ref("concerts/revid/");
-  
-  // await ref.once("value", function(snapshot) {
-  //   revid = snapshot.val();
-  // });
 
   return revid;
 };
