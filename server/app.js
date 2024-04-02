@@ -49,7 +49,7 @@ app.get('/api/concerts', async (req, res) => {
     
     res.header("Content-Type",'application/json');
     res.send(JSON.stringify(data, null, 4));
-    
+
   } catch (error) {
     res.status(500).send(`
       The following error occurred: 
@@ -57,33 +57,6 @@ app.get('/api/concerts', async (req, res) => {
     `);
   }
 })
-
-app.get('/api/update-concert-data', async (req, res) => { 
-    try {
-      const newWikipediaData = await getWikipediaData();
-      const dbData = await getAllData();
-
-      console.log(newWikipediaData.externallinks[newWikipediaData.externallinks.length - 1]);
-
-      // updateConcertsLinks(newWikipediaData.externallinks[newWikipediaData.externallinks.length - 1])
-
-      console.log('logging newWikipediaData.externallinks', newWikipediaData.externallinks)
-
-      setConcertsLinks(newWikipediaData.externallinks);
-
-      if (newWikipediaData.revid === dbData.revid) {
-        res.json(dbData);
-      } else {
-        setRevid(newWikipediaData.revid);
-        res.json(dbData);
-      }
-
-    } catch (error) {
-      res.status(500).send(`
-        The following error occurred: ${error.message}
-    `);
-    }
-});
 
 app.get('/api/random-concert', async (req, res) => {
   try {
