@@ -18,7 +18,7 @@ const port = 3000;
  */
 app.use(express.static('public'));
 app.use('/cron', cron);
-app.set("views", 'views');
+app.set("views", __dirname + '/../views');
 app.set('view engine', 'ejs');
 
 /**
