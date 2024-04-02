@@ -4,6 +4,7 @@ import {
   getRandConcert, 
   getAllData,
 } from '../db.js';
+import { __dirname } from '../utils.js';
 import { cron } from './cron.js';
 
 /**
