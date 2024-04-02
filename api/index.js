@@ -1,15 +1,9 @@
 import dotenv from 'dotenv';
 import express from 'express';
-import path from 'path';
-import { 
-  __dirname,
-   __filename,
-  getWikipediaData } from '../utils.js';
 import {  
   getRandConcert, 
   getAllData,
-  setConcertsLinks,
-  setRevid } from '../db.js';
+} from '../db.js';
 import { cron } from './cron.js';
 
 /**
@@ -22,9 +16,9 @@ const port = 3000;
 /** 
  * MIDDLEWARE
  */
-app.use(express.static(path.resolve(__dirname, '../public')));
+app.use(express.static('public'));
 app.use('/cron', cron);
-app.set("views", path.resolve(__dirname, './views'));
+app.set("views", 'views');
 app.set('view engine', 'ejs');
 
 /**
