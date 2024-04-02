@@ -1,17 +1,10 @@
 {
-  "version": 2,
-  "builds": [
+	"version": 2,
+	"rewrites": [{ "source": "/(.*)", "destination": "/api" }],
+  "crons": [
     {
-      "src": "server/*",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "public/**",
-      "use": "@vercel/static"
+        "path": "/cron",
+        "schedule": "0 0 * * *"
     }
-  ],
-  "routes": [
-    { "handle": "filesystem" },
-    { "src": "/(.*)", "dest": "/server/app.js" }
-  ]
+  ]      
 }

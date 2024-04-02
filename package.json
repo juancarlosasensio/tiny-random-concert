@@ -2,11 +2,11 @@
   "name": "random-tiny-concert",
   "version": "1.0.0",
   "description": "Enjoy a random Tiny Desk Concert",
-  "main": "server/app.js",
+  "main": "index.js",
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon server/app.js"
+    "dev": "nodemon api/index.js"
   },
   "author": "Juan Carlos Asensio",
   "license": "MIT",
