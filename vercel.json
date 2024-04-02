@@ -16,7 +16,7 @@
   ],
   "crons": [
     {
-      "path": "/server/cron/updateDB",
+      "path": "/cron/updateDB",
       "schedule": "0 0 * * *"
     }
   ]

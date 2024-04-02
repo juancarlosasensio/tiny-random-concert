@@ -1,4 +1,4 @@
-import { getAllData } from "./db";
+import { getAllData } from "../server/db";
 
 // TODO: setup endpoint to be requested by cron job only when new wikipedia data is available
 // It should: PUSH only the new concert links from wikipedia, update revid and concerts_count correctly
