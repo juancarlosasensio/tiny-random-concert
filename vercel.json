@@ -13,5 +13,11 @@
   "routes": [
     { "handle": "filesystem" },
     { "src": "/(.*)", "dest": "/server/app.js" }
+  ],
+  "crons": [
+    {
+      "path": "/server/cron",
+      "schedule": "0 11 * * 2"
+    }
   ]
 }

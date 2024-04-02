@@ -35,7 +35,7 @@ export const getAllData = async () => {
   return allData;
 };
 
-export const getCurrentRevId = async () => {
+export const getRevid = async () => {
   let revid = '';  
   const ref = db.ref("concerts/revid/");
   
@@ -46,21 +46,9 @@ export const getCurrentRevId = async () => {
   return revid;
 };
 
-export const getRevid = async () => {
-  console.log('getting revid via fetch api call')
-  const revid = await fetch(`${FIREBASE_DB_URL}/concerts/revid?shallow=true?auth=${{uid: process.env.FIREBASE_AUTH_UID}}`);
-  console.log('successful fetch', { revid });
-
-  // const ref = db.ref("concerts/revid/");
-  
-  // await ref.once("value", function(snapshot) {
-  //   revid = snapshot.val();
-  // });
-
-  return revid;
-};
-
 export const setRevid = async (id) => {  
+  // Consider setting this kind of validation in the Firebase Realtime DB Security rules
+  // Can even request security rules as JSON: https://firebase.google.com/docs/reference/admin/node/firebase-admin.security-rules
   if (!id || typeof id !== 'number') {
     throw new Error('revid must be a valid number');
   } else {
