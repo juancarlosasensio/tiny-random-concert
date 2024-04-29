@@ -17,7 +17,6 @@ const port = 3000;
 /** 
  * MIDDLEWARE
  */
-app.use('/cron', cron);
 app.set("views", __dirname + '/views');
 app.set('view engine', 'ejs');
 app.use(express.static(__dirname + '/public'));
@@ -25,6 +24,11 @@ app.use(express.static(__dirname + '/public'));
 /**
  * Routes
  */
+
+// Cron controller
+app.use('/cron', cron);
+
+// Index page
 app.get('/', async (req, res) => { 
     try {
       const randLink = await getRandConcert();
@@ -39,6 +43,7 @@ app.get('/', async (req, res) => {
     }
 });
 
+// API Controllers
 app.get('/api/concerts', async (req, res) => {
   let data = {};
   try {
