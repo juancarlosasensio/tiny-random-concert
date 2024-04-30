@@ -48,6 +48,9 @@ app.get('/', async (req, res) => {
 app.get('/api/concerts', async (req, res) => {
   let data = {};
   try {
+    console.log(__dirname);
+    console.log(path.join(__dirname, "/views"))
+
     data = {...await getAllData()}
     
     res.header("Content-Type",'application/json');
