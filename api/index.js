@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
 import express from 'express';
+import path from 'path';
 import {  
   getRandConcert, 
   getAllData,
@@ -17,9 +18,9 @@ const port = 3000;
 /** 
  * MIDDLEWARE
  */
-app.set("views", __dirname + '/views');
+app.set("views", path.join(__dirname, '/views'));
 app.set('view engine', 'ejs');
-app.use(express.static(__dirname + '/public'));
+app.use(express.static(path.join(__dirname, '/public')));
 
 /**
  * Routes
