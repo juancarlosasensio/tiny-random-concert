@@ -1,17 +1,10 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "server/*",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "public/**",
-      "use": "@vercel/static"
+	"version": 2,
+	"rewrites": [
+    { 
+      "source": "/(.*)", 
+      "destination": "/api/index.js" 
     }
-  ],
-  "routes": [
-    { "src": "/(.*)", "dest": "/api/index.js" }
   ],
   "crons": [
     {
