@@ -34,7 +34,7 @@ app.get('/', async (req, res) => {
     try {
       const randLink = await getRandConcert();
       
-      res.render('index.ejs', {
+      res.render('index', {
         concertLink: randLink
       });
     } catch (error) {
