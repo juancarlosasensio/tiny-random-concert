@@ -12,7 +12,7 @@
   ],
   "routes": [
     { "handle": "filesystem" },
-    { "src": "/(.*)", "dest": "/server/app.js" }
+    { "src": "/(.*)", "dest": "/api/index.js" }
   ],
   "crons": [
     {
