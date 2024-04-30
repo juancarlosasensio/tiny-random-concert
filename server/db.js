@@ -115,6 +115,25 @@ export const updateCount = async () => {
   });
 }
 
+export const getCount = async () => {
+  let count = 0;  
+  const ref = db.ref("concerts/concerts_count");
+  
+  await ref.once("value", function(snapshot) {
+    count = snapshot.val();
+  });
+  return count;
+};
+
+export const setCount = async (num) => {
+    if (!num || typeof num !== 'number') {
+    throw new Error('revid must be a valid number');
+  } else {
+    const countRef = db.ref('concerts/concerts_count');
+    countRef.set(num)   
+  }
+}
+
 // Export Firebase DB
 export default db;
 
