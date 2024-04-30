@@ -17,7 +17,7 @@ const port = 3000;
 /** 
  * MIDDLEWARE
  */
-app.set("views", __dirname + '/../views');
+app.set("views", __dirname + '/views');
 app.set('view engine', 'ejs');
 app.use(express.static(__dirname + '/public'));
 
