@@ -1,8 +1,14 @@
 {
 	"version": 2,
 	"rewrites": [
-    { "source": "/api", "destination": "/api" },
-    { "source": "/", "destination": "/" }
+    { 
+      "source": "/(.*)", 
+      "destination": "/api" 
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/$1"
+    }
   ],
   "crons": [
     {
