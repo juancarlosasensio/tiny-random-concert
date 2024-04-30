@@ -1,8 +1,14 @@
 {
 	"version": 2,
-	"routes": [
-    { "src": "/api/(.*)", "dest": "/api/$1" },
-    { "src": "/(.*)", "dest": "/api/index.js" }
+	"rewrites": [
+    { 
+      "source": "/(.*)", 
+      "destination": "/api" 
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/$1"
+    }
   ],
   "crons": [
     {
