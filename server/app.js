@@ -1,15 +1,8 @@
 import dotenv from 'dotenv';
 import express from 'express';
 import path from 'path';
-import { 
-  __dirname,
-   __filename,
-  getWikipediaData } from './utils.js';
-import {  
-  getRandConcert, 
-  getAllData,
-  setConcertsLinks,
-  setRevid } from './db.js';
+import { __dirname, __filename } from './utils.js';
+import { getRandConcert, getAllData } from './db.js';
 import { cron } from './cron.js'
 
 /**
@@ -26,6 +19,8 @@ app.use(express.static(path.resolve(__dirname, '../public')));
 app.set("views", path.resolve(__dirname, '../views'));
 app.set('view engine', 'ejs');
 
+
+// Cron job route handler
 app.use('/cron', cron);
 
 /**

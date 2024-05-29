@@ -2,8 +2,12 @@ import { URL, isConcertLink } from './utils.js';
 import { getRevid, setRevid, setCount, setConcertsLinks, getCount } from './db.js';
 
 export const cron = async (req, res) => {
-  if (!process.env.CRON_SECRET) {
-    return response.status(401).json({
+  
+  // Prevents un-authorized requests
+  const authHeader = req.get('authorization');
+
+  if (!process.env.CRON_SECRET || authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    return res.status(401).json({
       success: false, message: 'Unauthorized request'
   })}
 
@@ -41,7 +45,7 @@ export const cron = async (req, res) => {
 
   } catch (error) {
     res.status(500).json({
-      succes: false,
+      success: false,
       message: `Cron failed due to: ${error.message}`
     });
   }
