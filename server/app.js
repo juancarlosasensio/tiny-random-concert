@@ -1,15 +1,8 @@
 import dotenv from 'dotenv';
 import express from 'express';
 import path from 'path';
-import { 
-  __dirname,
-   __filename,
-  getWikipediaData } from './utils.js';
-import {  
-  getRandConcert, 
-  getAllData,
-  setConcertsLinks,
-  setRevid } from './db.js';
+import { __dirname, __filename } from './utils.js';
+import { getRandConcert, getAllData } from './db.js';
 import { cron } from './cron.js'
 
 /**
