@@ -4,7 +4,6 @@
 
 - As a user, I can easily get a random tiny desk concert
 
-
 ### Technical requirements
 
 - As an engineer, I can persist Tiny Desk concert data securely
@@ -16,5 +15,5 @@
   - Make sure no data is lost and data structure remains consistent as new data gets added
   - Automate data updates, i.e.: avoid the need to make these updates manually
 
-- As an engineer, I want to style the product to make it fun to sue
+- As an engineer, I want to style the product to make it fun to use
   - Give it that game feel: http://www.game-feel.com/ && https://www.andy.works/words/the-most-satisfying-checkbox
