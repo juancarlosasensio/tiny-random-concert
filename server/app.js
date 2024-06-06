@@ -44,10 +44,7 @@ app.get('/api/concerts', async (req, res) => {
   let data = {};
   try {
     data = {...await getAllData()}
-    
-    res.header("Content-Type",'application/json');
-    res.send(JSON.stringify(data, null, 4));
-
+    res.json(data);
   } catch (error) {
     res.status(500).send(`
       The following error occurred: 
