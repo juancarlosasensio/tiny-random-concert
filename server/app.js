@@ -1,12 +1,14 @@
 import dotenv from 'dotenv';
-import express from 'express';
 import path from 'path';
+import express from 'express';
+import basicAuth from 'express-basic-auth';
 import { __dirname, __filename } from './utils.js';
-import { getRandConcert, getAllData } from './db.js';
-import { cron } from './cron.js'
+import { getRandConcert } from './db.js';
+import { cron as cronRouteHandler } from './cron.js';
+import { router as apiRouter } from './api.js';
 
 /**
- * Config and Constants
+ * CONFIG/CONSTANTS
  */
 dotenv.config();
 const app = express();
@@ -19,13 +21,17 @@ app.use(express.static(path.resolve(__dirname, '../public')));
 app.set("views", path.resolve(__dirname, '../views'));
 app.set('view engine', 'ejs');
 
-
-// Cron job route handler
-app.use('/cron', cron);
-
 /**
- * Routes
+ * ROUTE HANDLERS
  */
+
+// Cron job handler
+app.use('/cron', cronRouteHandler);
+
+// API router with basic auth middleware
+app.use("/api", basicAuth({ users: { 'admin': process.env.API_PSWD }}), apiRouter);
+
+// Content
 app.get('/', async (req, res) => { 
     try {
       const randLink = await getRandConcert();
@@ -40,31 +46,9 @@ app.get('/', async (req, res) => {
     }
 });
 
-app.get('/api/concerts', async (req, res) => {
-  let data = {};
-  try {
-    data = {...await getAllData()}
-    res.json(data);
-  } catch (error) {
-    res.status(500).send(`
-      The following error occurred: 
-      ${error.message}
-    `);
-  }
-})
-
-app.get('/api/random-concert', async (req, res) => {
-  try {
-    const randLink = await getRandConcert();
-    res.json(randLink)
-
-  } catch (error) {
-    res.status(500).send(`
-      The following error occurred: 
-      ${error.message}
-    `);
-  }
-})
+/**
+ * LISTEN ON PORT
+ */
 
 app.listen(port, () => {
   console.log(`Example app listening on port http://localhost:${port}/`)

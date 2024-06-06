@@ -2,7 +2,6 @@ import { URL, isConcertLink } from './utils.js';
 import { getRevid, setRevid, setCount, setConcertsLinks, getCount } from './db.js';
 
 export const cron = async (req, res) => {
-  
   // Prevents un-authorized requests
   const authHeader = req.get('authorization');
 
