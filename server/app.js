@@ -35,7 +35,7 @@ const limiter = rateLimit({
       You've maxed out the number of random concerts for today. 
       Please try again tomorrow :)
     `
-    next();
+    next(); // See: https://dev.to/brunohgv/limiting-node-js-api-calls-with-express-rate-limit-11kl#:~:text=const%20apiRequestLimiter%20%3D%20rateLimit(%7B%0A%20%20%20%20windowMs%3A%201%20*%2060%20*%201000%2C%20//%201%20minute%0A%20%20%20%20max%3A%202%2C%20//%20limit%20each%20IP%20to%202%20requests%20per%20windowMs%0A%20%20%20%20handler%3A%20function%20(req%2C%20res%2C%20next)%20%7B%0A%20%20%20%20%20%20applyFeesForConsumer()%0A%20%20%20%20%20%20next()%0A%20%20%20%20%7D%0A%7D)
   }
 })
 
