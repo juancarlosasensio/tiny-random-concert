@@ -46,7 +46,9 @@ app.use("/api", basicAuth({ users: { 'admin': process.env.API_PSWD }}), apiRoute
 
 // Content
 app.get('/', limiter, async (req, res) => {
-    console.log('ip address is: ', req.ip); 
+    console.log('ip address is: ', req.ip);
+    console.log('clientIp address is', req.clientIp);
+     
     try {
       const randLink = await getRandConcert();
       
