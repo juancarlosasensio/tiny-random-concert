@@ -7,6 +7,9 @@
     <h1>Random Tiny Desk Concert</h1>
     <main data-tiny-desk-concert>
       <a href='<%= concertLink %>' target='blank'>Here's your random concert. Click to reveal!</a>
+      <% if (serverMsg) { %>
+        <h2><%= serverMsg %></h2>
+      <% } %>
     </main>
 </body>
 </html> 

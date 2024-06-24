@@ -24,14 +24,19 @@ app.set("views", path.resolve(__dirname, '../views'));
 app.set('view engine', 'ejs');
 app.use(mw());
 
-
-// https://stackoverflow.com/questions/64188573/express-rate-limit-blocking-requests-from-all-users
-// https://www.npmjs.com/package/express-rate-limit
 const limiter = rateLimit({
   windowMs: 24 * 3600 * 1000, // 24 hours
 	limit: 5,
-  keyGenerator: (req, res) => req.clientIp,
-  message: 'Too many requests. Please try again tomorrow :)' 
+  keyGenerator: (req, res) => req.clientIp, // See: https://stackoverflow.com/questions/64188573/express-rate-limit-blocking-requests-from-all-users
+  status: 200,
+  handler: (req, res, next) => {
+    res.TRCData = {};
+    res.TRCData.message = `
+      You've maxed out the number of random concerts for today. 
+      Please try again tomorrow :)
+    `
+    next();
+  }
 })
 
 /**
@@ -46,19 +51,25 @@ app.use("/api", basicAuth({ users: { 'admin': process.env.API_PSWD }}), apiRoute
 
 // Content
 app.get('/', limiter, async (req, res) => {
-    console.log('ip address is: ', req.ip);
-    console.log('clientIp address is', req.clientIp);
-     
-    try {
-      const randLink = await getRandConcert();
-      
+    if (res?.TRCData?.message) {
       res.render('index.ejs', {
-        concertLink: randLink
+        concertLink: null,
+        serverMsg: res?.TRCData?.message
       });
-    } catch (error) {
-      res.status(500).send(`
-        The following error occurred: ${error.message}
-    `);
+    } else {
+          try {
+            const randLink = await getRandConcert();
+            console.log('randLink', randLink);
+            
+            res.render('index.ejs', {
+              concertLink: randLink,
+              serverMsg: null
+            });
+          } catch (error) {
+            res.status(500).send(`
+              The following error occurred: ${error.message}
+          `);
+        }
     }
 });
 
