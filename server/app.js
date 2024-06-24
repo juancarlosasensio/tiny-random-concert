@@ -2,6 +2,7 @@ import dotenv from 'dotenv';
 import path from 'path';
 import express from 'express';
 import basicAuth from 'express-basic-auth';
+import { rateLimit } from 'express-rate-limit';
 import { __dirname, __filename } from './utils.js';
 import { getRandConcert } from './db.js';
 import { cron as cronRouteHandler } from './cron.js';
@@ -21,6 +22,15 @@ app.use(express.static(path.resolve(__dirname, '../public')));
 app.set("views", path.resolve(__dirname, '../views'));
 app.set('view engine', 'ejs');
 
+
+// https://stackoverflow.com/questions/64188573/express-rate-limit-blocking-requests-from-all-users
+// https://www.npmjs.com/package/express-rate-limit
+const limiter = rateLimit({
+  windowMs: 24 * 3600 * 1000, // 24 hours
+	limit: 5,
+  message: 'Too many requests. Please try again tomorrow :)' 
+})
+
 /**
  * ROUTE HANDLERS
  */
@@ -32,7 +42,8 @@ app.use('/cron', cronRouteHandler);
 app.use("/api", basicAuth({ users: { 'admin': process.env.API_PSWD }}), apiRouter);
 
 // Content
-app.get('/', async (req, res) => { 
+app.get('/', limiter, async (req, res) => {
+    console.log('ip address is: ', req.ip); 
     try {
       const randLink = await getRandConcert();
       
