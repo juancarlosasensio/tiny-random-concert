@@ -3,6 +3,7 @@ import path from 'path';
 import express from 'express';
 import basicAuth from 'express-basic-auth';
 import { rateLimit } from 'express-rate-limit';
+import { mw } from 'request-ip';
 import { __dirname, __filename } from './utils.js';
 import { getRandConcert } from './db.js';
 import { cron as cronRouteHandler } from './cron.js';
@@ -21,6 +22,7 @@ const port = 3000;
 app.use(express.static(path.resolve(__dirname, '../public')));
 app.set("views", path.resolve(__dirname, '../views'));
 app.set('view engine', 'ejs');
+app.use(mw());
 
 
 // https://stackoverflow.com/questions/64188573/express-rate-limit-blocking-requests-from-all-users
@@ -28,6 +30,7 @@ app.set('view engine', 'ejs');
 const limiter = rateLimit({
   windowMs: 24 * 3600 * 1000, // 24 hours
 	limit: 5,
+  keyGenerator: (req, res) => req.clientIp,
   message: 'Too many requests. Please try again tomorrow :)' 
 })
 
