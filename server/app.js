@@ -54,16 +54,19 @@ app.get('/', limiter, async (req, res) => {
     if (res?.TRCData?.message) {
       res.render('index.ejs', {
         concertLink: null,
-        serverMsg: res?.TRCData?.message
+        serverMsg: res?.TRCData?.message,
+        remainingCount: null
       });
     } else {
+          console.log
           try {
             const randLink = await getRandConcert();
             console.log('randLink', randLink);
             
             res.render('index.ejs', {
               concertLink: randLink,
-              serverMsg: null
+              serverMsg: null,
+              remainingCount: req?.rateLimit?.remaining
             });
           } catch (error) {
             res.status(500).send(`
