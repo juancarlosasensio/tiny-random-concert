@@ -11,8 +11,11 @@
         <% if (serverMsg) { %>
           <p><%= serverMsg %></p>
         <% } else { %>
-          <p>
-            <a href='<%= concertLink %>' target='blank'>Click to reveal your random concert!</a>
+          <div>
+            <a class="big cta" href='<%= concertLink %>' target='blank'>Reveal your random concert!</a>
+          </div>
+          <p class="text-sm">
+            You have 5 more concerts to go...
           </p>
         <% } %>
       </div>
