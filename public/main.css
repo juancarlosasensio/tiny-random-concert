@@ -112,7 +112,8 @@
     --transition-bounce: 500ms cubic-bezier(0.5,0.05,0.2,1.5);
     --tracking: -0.05ch;
     --tracking-s: -0.075ch;
-    --border-thin: var(--space-xs);
+    --border-thin: calc(var(--space-xs) * 0.5);
+    --border-thicker: var(--space-s);
 }
 
 body {
@@ -468,44 +469,22 @@ main:focus {
 }
 
 /* CTA */
-.cta {
+
+
+.cta,button {
+    font-size: inherit;
+    font-weight: 700;
+    display: inline-block;
+    cursor: pointer;
+    line-height: 1.1;
+    /* font-family: var(--font-special); */
+    color: var(--color-light);
+    background-color: var(--color-black);
+    padding: .7em 1.7em .9em;
+    border: var(--border-thin) solid var(--color-black);
+}
+
+.cta.inverse {
     background-color: transparent;
     color: var(--color-black);
-}
-.cta, button {
-    font-size: inherit;
-    font-weight: 700;
-    display: inline-block;
-    cursor: pointer;
-    line-height: 1.1;
-    font-family: var(--font-special);
-    color: var(--color-light);
-    background-color: var(--color-black);
-    padding: .5em 1.5em .7em;
-    border-width: var(--border-thin);
-}
-
-button, pre {
-    outline: var(--border-thin) solid transparent;
-    outline-offset: calc(var(--border-thin)* -1);
-}
-button {
-    border-color: var(--color-black);
-}
-.cta, button {
-    font-size: inherit;
-    font-weight: 700;
-    display: inline-block;
-    cursor: pointer;
-    line-height: 1.1;
-    font-family: var(--font-special);
-    color: var(--color-light);
-    background-color: var(--color-black);
-    padding: .5em 1.5em .7em;
-    border-width: var(--border-thin);
-}
-
-.cta .big  {
-    font-size: var(--size-step-2);
-    margin-block-start: var(--size-step-1);
 }
