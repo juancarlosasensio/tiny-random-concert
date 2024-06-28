@@ -4,13 +4,19 @@
   <%- include('./partials/head') %>
 </head>
 <body>
-    <h1>Random Tiny Desk Concert</h1>
-    <main data-tiny-desk-concert>
-      <% if (serverMsg) { %>
-        <h2><%= serverMsg %></h2>
-      <% } else { %>
-        <a href='<%= concertLink %>' target='blank'>Click to reveal your random concert!</a>
-      <% } %>
-    </main>
+  <main data-tiny-desk-concert>
+    <article class="region">
+      <div class="wrapper flow">
+        <h1>Random Tiny Desk Concert</h1>
+        <% if (serverMsg) { %>
+          <p><%= serverMsg %></p>
+        <% } else { %>
+          <p>
+            <a href='<%= concertLink %>' target='blank'>Click to reveal your random concert!</a>
+          </p>
+        <% } %>
+      </div>
+    </article>
+  </main>
 </body>
 </html> 
